@@ -11,6 +11,30 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'HomeController@index')->name('index');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@home')->name('home');
+
+/*Route::get('/test', function () {
+    $var = new \App\Models\ItemVehicle;
+    dd($var->getTable());
+});*/
+
+Route::prefix('customers')->group(function () {
+    Route::get('/', 'CustomerOfficeController@index');
 });
+
+Route::prefix('orders')->group(function () {
+    Route::get('/', 'OrderController@index');
+    Route::get('create', 'OrderController@createView');
+    Route::post('filterOrders', 'OrderController@filterOrders');
+});
+
+Route::prefix('request')->group(function () {
+    Route::post('getItemsFromVIN', 'RequestController@getItemsFromVIN');
+    Route::post('createOrder', 'RequestController@createOrder');
+});
+
+

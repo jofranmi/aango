@@ -2,6 +2,9 @@
 
 namespace App;
 
+use App\Models\Customer;
+use App\Models\Order;
+use Cassandra\Type\UserType;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,7 +19,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'user_type_id',
+        'customer_id',
+        'name',
+        'email',
+        'password',
     ];
 
     /**
@@ -25,7 +32,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -36,4 +44,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(Models\UserType::class);
+    }
 }
