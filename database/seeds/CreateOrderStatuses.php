@@ -11,7 +11,7 @@ class CreateOrderStatuses extends Seeder
      */
     public function run()
     {
-        DB::table('status')->insert([
+        DB::table('statuses')->insert([
             ['name' => 'Pending'],
             ['name' => 'Processing'],
             ['name' => 'Assigned'],

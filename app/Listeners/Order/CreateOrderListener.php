@@ -9,6 +9,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Class CreateOrderListener
+ * @package App\Listeners\Order
+ */
 class CreateOrderListener implements ShouldQueue
 {
     /**
@@ -62,8 +66,7 @@ class CreateOrderListener implements ShouldQueue
 
         if ($order) {
             event(new NotificationEvent('Order has been created successfully!', 'alert-success'));
-        }
-        else {
+        } else {
             event(new NotificationEvent('There was an error creating the order', 'alert-danger'));
         }
     }

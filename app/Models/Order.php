@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     /**
-     * @var array
+     * @var array $fillable
      */
     protected $fillable = [
         'user_id',

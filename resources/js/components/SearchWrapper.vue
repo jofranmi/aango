@@ -40,18 +40,16 @@
                         if (typeof this.filter === 'object') {
                             let key = Object.keys(this.filter);
                             let value = [this.filter[key[0]]];
+
                             if (typeof item[key][value] == 'string') {
                                 return item[key][value].toLowerCase().includes(this.query.toLowerCase());
-                            }
-                            else if (typeof item[key][value] == 'number') {
+                            } else if (typeof item[key][value] == 'number') {
                                 return item[key][value] == this.query;
                             }
-                        }
-                        else {
+                        } else {
                             if (typeof item[this.filter] == 'string') {
                                 return item[this.filter].toLowerCase().includes(this.query.toLowerCase());
-                            }
-                            else if (typeof item[this.filter] == 'number') {
+                            } else if (typeof item[this.filter] == 'number') {
                                 return item[this.filter] == this.query;
                             }
                         }

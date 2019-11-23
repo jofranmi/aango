@@ -35,6 +35,11 @@ Route::prefix('orders')->group(function () {
 Route::prefix('request')->group(function () {
     Route::post('getItemsFromVIN', 'RequestController@getItemsFromVIN');
     Route::post('createOrder', 'RequestController@createOrder');
+    Route::post('createCustomer', 'RequestController@createCustomer');
+    Route::post('editCustomer', 'RequestController@editCustomer');
+    Route::post('getCustomerWithUsers', 'RequestController@getCustomerWithUsers');
+    Route::post('removeUserFromCustomer', 'RequestController@removeUserFromCustomer');
+    Route::post('addUserToCustomer', 'RequestController@addUserToCustomer');
 });
 
 

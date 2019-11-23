@@ -1,10 +1,10 @@
 <template>
-    <div class="row">
+    <div class="form-row">
         <filter-string v-model="request.filters.vin.value" :text="'VIN'"></filter-string>
         <filter-string v-model="request.filters.year.value" :text="'Year'"></filter-string>
         <filter-string v-model="request.filters.make.value" :text="'Make'"></filter-string>
         <filter-string v-model="request.filters.model.value" :text="'Model'"></filter-string>
-        <div class="input-group mb-3 col-sm-1 col-sm-4 col-lg-3">
+        <div v-if="authorized" class="input-group mb-3 col-sm-1 col-sm-4 col-lg-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">Customer</span>
             </div>
@@ -19,7 +19,7 @@
             </div>
             <select v-model="request.joins.items.value" class="form-control">
                 <option value="" selected>All key types</option>
-                <option v-for="item in items" :value="item['type']">{{ item['type']}}</option>
+                <option v-for="item in items" :value="item['name']">{{ item['name']}}</option>
             </select>
         </div>
         <div class="input-group mb-3 col-sm-1 col-sm-4 col-lg-3">

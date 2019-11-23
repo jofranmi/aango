@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\Customer\CreateCustomerEvent;
 use App\Events\Notification\NotificationEvent;
 use App\Events\Order\CreateOrderEvent;
+use App\Listeners\Customer\CreateCustomerListener;
 use App\Listeners\Notification\NotificationListener;
 use App\Listeners\Order\CreateOrderListener;
 use Illuminate\Auth\Events\Registered;
@@ -21,6 +23,7 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [SendEmailVerificationNotification::class],
         CreateOrderEvent::class => [CreateOrderListener::class],
+        CreateCustomerEvent::class => [CreateCustomerListener::class],
         NotificationEvent::class => [NotificationListener::class],
     ];
 
@@ -32,7 +35,5 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
-
-        //
     }
 }

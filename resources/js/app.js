@@ -35,6 +35,21 @@ Vue.component(
     require('./components/customer/index/CustomerCard.vue').default
 );
 
+Vue.component(
+    'customer-create-table',
+    require('./components/customer/index/CustomerCreateTable.vue').default
+);
+
+Vue.component(
+    'customer-view-edit-table',
+    require('./components/customer/index/CustomerViewEditTable.vue').default
+);
+
+Vue.component(
+    'customer-remove-modal',
+    require('./components/customer/index/CustomerRemoveModal.vue').default
+);
+
 /**
  * Order
  */
