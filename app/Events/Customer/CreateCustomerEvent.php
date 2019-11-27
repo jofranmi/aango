@@ -2,24 +2,15 @@
 
 namespace App\Events\Customer;
 
-use App\Events\Notification\NotificationEvent;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
+use App\Events\AbstractEvent;
 use Illuminate\Http\Request;
-use Illuminate\Queue\SerializesModels;
 
 /**
  * Class CreateCustomerEvent
  * @package App\Events\Customer
  */
-class CreateCustomerEvent
+class CreateCustomerEvent extends AbstractEvent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
     /**
      * @var string $name
      */
@@ -52,20 +43,12 @@ class CreateCustomerEvent
      */
     public function __construct(Request $request)
     {
+        parent::__construct();
+
         $this->name = $request->name;
         $this->address = $request->address;
         $this->city = $request->city;
         $this->state = $request->state;
         $this->zip_code = $request->zip_code;
-    }
-
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
-     */
-    public function broadcastOn()
-    {
-        return new Channel('notifications');
     }
 }

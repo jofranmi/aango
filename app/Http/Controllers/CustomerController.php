@@ -40,27 +40,4 @@ class CustomerController extends Controller
     {
         return view('customer.create');
     }
-
-    /**
-     * @param Request $request
-     */
-    public function create(Request $request)
-    {
-
-    }
-
-    public function view()
-    {
-
-    }
-
-    public function edit()
-    {
-
-    }
-
-    public function delete()
-    {
-
-    }
 }

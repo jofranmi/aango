@@ -23,7 +23,9 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">State</span>
                 </div>
-                <input v-model="state" type="text" class="form-control">
+                <select v-model="state" class="custom-select">
+                    <option v-for="(state, stt) in states" :value="stt">{{ state }}</option>
+                </select>
             </div>
             <div class="input-group mb-3 col-sm-1 col-sm-4 col-lg-3">
                 <div class="input-group-prepend">
@@ -74,6 +76,9 @@
         mounted() {
             console.log('Customer create table mounted.')
         },
+        props: {
+            states: {type: Object}
+        },
         computed: {
             buttonDisable: function () {
                 return this.name == '' || this.address == '' || this.city == '' || this.state == '' || this.zip_code == '' || this.phone == '' || this.query;
@@ -96,7 +101,6 @@
         },
         methods: {
             editCustomer() {
-                let eventHub = this.$eventHub;
                 let vm = this;
                 this.query = true;
 
@@ -136,7 +140,7 @@
             },
         },
         created: function() {
-            this.$eventHub.$on('viewEdit', (data) => {
+            this.$eventHub.$on('viewEditCustomer', (data) => {
                 this.customer = data.customer;
                 this.name = data.customer.name;
                 this.address = data.customer.address;

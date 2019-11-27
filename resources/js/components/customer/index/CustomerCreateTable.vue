@@ -22,7 +22,9 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">State</span>
             </div>
-            <input v-model="state" type="text" class="form-control">
+            <select v-model="state" class="custom-select">
+                <option v-for="(state, stt) in states" :value="stt">{{ state }}</option>
+            </select>
         </div>
         <div class="input-group mb-3 col-sm-1 col-sm-4 col-lg-3">
             <div class="input-group-prepend">

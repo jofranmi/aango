@@ -51,6 +51,29 @@ Vue.component(
 );
 
 /**
+ * User
+ */
+Vue.component(
+    'user-card',
+    require('./components/user/index/UserCard.vue').default
+);
+
+Vue.component(
+    'user-create-table',
+    require('./components/user/index/UserCreateTable.vue').default
+);
+
+Vue.component(
+    'user-view-edit-table',
+    require('./components/user/index/UserViewEditTable.vue').default
+);
+
+Vue.component(
+    'user-remove-modal',
+    require('./components/user/index/UserRemoveModal.vue').default
+);
+
+/**
  * Order
  */
 Vue.component(
@@ -74,7 +97,7 @@ Vue.component(
 );
 
 /**
- * filters
+ * Filters
  */
 Vue.component(
     'filter-string',
@@ -84,6 +107,11 @@ Vue.component(
 Vue.component(
     'filter-date',
     require('./components/filters/FilterDate.vue').default
+);
+
+Vue.component(
+    'filter-select',
+    require('./components/filters/FilterSelect.vue').default
 );
 
 /**
@@ -102,6 +130,10 @@ Vue.filter('date', function (date) {
     return moment(date).format('MM-DD-YYYY');
 })
 
+Vue.filter('capitalize', function (value) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+})
+
 const app = new Vue({
     el: '#app',
     methods: {
@@ -112,10 +144,4 @@ const app = new Vue({
             return moment(date).format('MM-DD-YYYY');
         }
     },
-    mounted() {
-        /*Echo.channel('notifications')
-            .listen('.my-event', function(data) {
-                alert(JSON.stringify(data));
-            });*/
-    }
 });

@@ -50,14 +50,14 @@ class CreateCustomerListener implements ShouldQueue
             ]);
 
         if ($customer) {
-            event(new NotificationEvent('Customer has been created successfully!', 'alert-success'));
+            event(new NotificationEvent('Customer has been created successfully!', 'alert-success', $event->user));
         } else {
-            event(new NotificationEvent('There was an error creating the customer', 'alert-danger'));
+            event(new NotificationEvent('There was an error creating the customer', 'alert-danger', $event->user));
         }
     }
 
     public function failed(CreateCustomerEvent $event)
     {
-        event(new NotificationEvent('There was an error creating the customer', 'alert-danger'));
+        event(new NotificationEvent('There was an error creating the customer', 'alert-danger', $event->user));
     }
 }

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Events\Customer\CreateCustomerEvent;
 use App\Events\Notification\NotificationEvent;
 use App\Events\Order\CreateOrderEvent;
+use App\Events\User\CreateUserEvent;
+use App\Mail\user\UserCreateMail;
+use App\Mail\User\UserPasswordChangeMail;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\UserType;
@@ -15,7 +18,8 @@ use App\User;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Mail\Mailer;
+use Illuminate\Support\Facades\Hash;
 
 class RequestController extends Controller
 {
@@ -30,6 +34,11 @@ class RequestController extends Controller
     protected $itemService;
 
     /**
+     * @var Mailer $mailer
+     */
+    protected $mailer;
+
+    /**
      * @var Order $order
      */
     protected $order;
@@ -40,16 +49,33 @@ class RequestController extends Controller
     protected $user;
 
     /**
+     * @var UserPasswordChangeMail $userPasswordChange
+     */
+    protected $userPasswordChangeMail;
+
+    /**
      * @var VINService $vinService
      */
     protected $vinService;
 
-    public function __construct(Customer $customer, ItemService $itemService, Order $order, User $user, VINService $vinService)
+    /**
+     * RequestController constructor.
+     * @param Customer $customer
+     * @param ItemService $itemService
+     * @param Mailer $mailer
+     * @param Order $order
+     * @param User $user
+     * @param UserPasswordChangeMail $userPasswordChangeMail
+     * @param VINService $vinService
+     */
+    public function __construct(Customer $customer, ItemService $itemService, Mailer $mailer, Order $order, User $user, UserPasswordChangeMail $userPasswordChangeMail, VINService $vinService)
     {
         $this->customer = $customer;
         $this->itemService = $itemService;
+        $this->mailer = $mailer;
         $this->order = $order;
         $this->user = $user;
+        $this->userPasswordChangeMail = $userPasswordChangeMail;
         $this->vinService = $vinService;
     }
 
@@ -91,7 +117,7 @@ class RequestController extends Controller
     public function createOrder(Request $request)
     {
         event(new NotificationEvent('Order create request has been sent and will be processed shortly', 'alert-info'));
-        event(new CreateOrderEvent(null, $request->key, $request->vehicle, $request->vin, Auth::user()));
+        event(new CreateOrderEvent(null, $request->key, $request->vehicle, $request->vin));
     }
 
     /**
@@ -101,6 +127,15 @@ class RequestController extends Controller
     {
         event(new NotificationEvent('Customer create request has been sent and will be processed shortly', 'alert-info'));
         event(new CreateCustomerEvent($request));
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function createUser(Request $request)
+    {
+        event(new NotificationEvent('User create request has been sent and will be processed shortly', 'alert-info'));
+        event(new CreateUserEvent($request));
     }
 
     public function editCustomer(Request $request)
@@ -114,7 +149,11 @@ class RequestController extends Controller
         $customer->zip_code = $request->zip_code;
         //$customer->phone = $request->phone;
 
-        $customer->save();
+        if ($customer->save()) {
+            event(new NotificationEvent('Customer information has been updated', 'alert-success'));
+        } else {
+            event(new NotificationEvent('There was an error updating the customer information', 'alert-danger'));
+        }
 
         return response('Customer has been updated');
     }
@@ -149,6 +188,12 @@ class RequestController extends Controller
             ->find($request->id)
             ->update(['customer_id' => 0]);
 
+        if ($update) {
+            event(new NotificationEvent('User has been removed from the customer', 'alert-success'));
+        } else {
+            event(new NotificationEvent('There was an error removing the user from the customer', 'alert-danger'));
+        }
+
         return response([$update]);
     }
 
@@ -163,7 +208,56 @@ class RequestController extends Controller
         $customer = $this->customer
             ->find($request->customer_id);
 
-        $user->update(['customer_id' => $customer->id]);
+        if ($user->update(['customer_id' => $customer->id])) {
+            event(new NotificationEvent('User has been added to customer', 'alert-success'));
+        } else {
+            event(new NotificationEvent('There was an error adding the user to the customer', 'alert-danger'));
+        }
+
+        return response($user);
+    }
+
+    /**
+     * @param Request $request
+     * @return ResponseFactory|Response
+     */
+    public function getUser(Request $request)
+    {
+        $user = $this->user
+            ->with('customer')
+            ->find($request->id);
+
+        return response($user);
+    }
+
+    /**
+     * @param Request $request
+     * @return ResponseFactory|Response
+     */
+    public function editUser(Request $request)
+    {
+        $password = $request->password;
+        $user = $this->user->find($request->id);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($password != '') {
+            $user->password = Hash::make($password);
+        }
+
+        if ($user->save()) {
+            event(new NotificationEvent('User information has been updated', 'alert-success'));
+
+            if ($password != '') {
+                $this->userPasswordChangeMail->setPassword($password);
+                $this->mailer
+                    ->to($user->email)
+                    ->send($this->userPasswordChangeMail);
+            }
+        } else {
+            event(new NotificationEvent('There was an error updating the user information', 'alert-danger'));
+        }
 
         return response($user);
     }

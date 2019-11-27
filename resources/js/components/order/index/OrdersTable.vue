@@ -37,7 +37,7 @@
                 <th scope="col">{{ order.id }}</th>
                 <th scope="col">{{ order.vin }}</th>
                 <th scope="col">{{ order.year + ' ' + order.make + ' ' + order.model }}</th>
-                <th scope="col">{{ order.items[0].item.type }}</th>
+                <th scope="col">{{ order.items[0].item.name }}</th>
                 <th scope="col">{{ order.total | money }}</th>
                 <th scope="col">{{ order.user.name }}</th>
                 <th scope="col">{{ order.created_at | date }}</th>

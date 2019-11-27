@@ -4,14 +4,15 @@ namespace App;
 
 use App\Models\Customer;
 use App\Models\Order;
-use Cassandra\Type\UserType;
+use App\Models\UserType;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable;//, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +35,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'created_at',
+        'updated_at',
+        'email_verified_at',
     ];
 
     /**
@@ -44,6 +48,15 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeCustomers($query)
+    {
+        return $query->where('user_types_id', UserType::CUSTOMER);
+    }
 
     public function customer()
     {
@@ -57,6 +70,6 @@ class User extends Authenticatable
 
     public function type()
     {
-        return $this->belongsTo(Models\UserType::class);
+        return $this->belongsTo(UserType::class);
     }
 }

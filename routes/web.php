@@ -11,28 +11,27 @@
 |
 */
 
-Route::get('/', 'HomeController@index')->name('index');
+Route::get('/', 'HomeController@home')->name('index');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@home')->name('home');
 
-/*Route::get('/test', function () {
-    $var = new \App\Models\ItemVehicle;
-    dd($var->getTable());
-});*/
-
 Route::prefix('customers')->group(function () {
     Route::get('/', 'CustomerOfficeController@index');
 });
 
-Route::prefix('orders')->group(function () {
+Route::prefix('users')->group(function () {
+    Route::get('/', 'UserController@index');
+});
+
+Route::prefix('orders')->middleware('auth')->group(function () {
     Route::get('/', 'OrderController@index');
     Route::get('create', 'OrderController@createView');
     Route::post('filterOrders', 'OrderController@filterOrders');
 });
 
-Route::prefix('request')->group(function () {
+Route::prefix('request')->middleware('auth')->group(function () {
     Route::post('getItemsFromVIN', 'RequestController@getItemsFromVIN');
     Route::post('createOrder', 'RequestController@createOrder');
     Route::post('createCustomer', 'RequestController@createCustomer');
@@ -40,6 +39,9 @@ Route::prefix('request')->group(function () {
     Route::post('getCustomerWithUsers', 'RequestController@getCustomerWithUsers');
     Route::post('removeUserFromCustomer', 'RequestController@removeUserFromCustomer');
     Route::post('addUserToCustomer', 'RequestController@addUserToCustomer');
+    Route::post('getUser', 'RequestController@getUser');
+    Route::post('createUser', 'RequestController@createUser');
+    Route::post('editUser', 'RequestController@editUser');
 });
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\UserType;
 use App\Policies\UserPolicy;
 use App\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -26,15 +27,15 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('admin', function ($user) {
-            return $user->user_type_id == 1;
+            return $user->user_types_id == UserType::ADMIN;
         });
 
         Gate::define('office', function ($user) {
-            return $user->user_type_id == 2;
+            return $user->user_types_id == UserType::OFFICE || $user->user_types_id == UserType::ADMIN;
         });
 
         Gate::define('customer', function ($user) {
-            return $user->user_type_id == 3;
+            return $user->user_types_id == UserType::CUSTOMER;
         });
     }
 }

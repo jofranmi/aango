@@ -22,7 +22,7 @@ class ItemService
      * @param Vehicle $vehicle
      * @return ItemVehicle|null
      */
-    public function getItemForVehicle(Vehicle $vehicle)
+    public function getItemForVehicle(Vehicle $vehicle): ?ItemVehicle
     {
         return $this->itemVehicle
             ->select(
@@ -33,7 +33,7 @@ class ItemService
             ->where('make', $vehicle->make)
             ->where('model', $vehicle->model)
             ->whereRaw('? between `year_from` and `year_to`', [$vehicle->year])
-            ->with('item:id,type')
+            ->with('item:id,name')
             ->first();
     }
 }

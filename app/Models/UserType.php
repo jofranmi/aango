@@ -16,4 +16,22 @@ class UserType extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeOffice($query)
+    {
+        return $query->where('id', self::OFFICE);
+    }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeCustomer($query)
+    {
+        return $query->where('id', self::CUSTOMER);
+    }
 }

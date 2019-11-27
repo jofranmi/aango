@@ -8,13 +8,13 @@
                 <div class="card-header">View orders</div>
 
                 <div class="card-body">
-                    @if (Gate::forUser(Auth::user())->allows('customer'))
+                    @can ('customer')
                         <orders-filter :items="{{ $items->toJson() }}" :status="{{ $status->toJson() }}" :authorized="false"></orders-filter>
                         <orders-table :data="{{ $orders->toJson() }}" :authorized="false"></orders-table>
                     @else
                         <orders-filter :customers="{{ $customers->toJson() }}" :items="{{ $items->toJson() }}" :status="{{ $status->toJson() }}" :authorized="true"></orders-filter>
                         <orders-table :data="{{ $orders->toJson() }}" :authorized="true"></orders-table>
-                    @endif
+                    @endcan
                     {{--<search-element :filters="{
                     'Name': {'user': 'name'},
                     'Id': 'id'

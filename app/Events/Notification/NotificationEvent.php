@@ -2,39 +2,51 @@
 
 namespace App\Events\Notification;
 
+use App\Events\AbstractEvent;
+use App\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class NotificationEvent
  * @package App\Events\Notification
  */
-class NotificationEvent implements ShouldBroadcast
+class NotificationEvent extends AbstractEvent implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
     /**
      * @var array $notification
      */
     public $notification;
 
     /**
+     * @var string $channel
+     */
+    public $channel;
+
+    /**
      * Create a new event instance.
      *
      * @param string $message
      * @param string $alert
+     * @param string $channel
+     * @param User|null $user
      */
-    public function __construct(string $message, string $alert)
+    public function __construct(string $message, string $alert, User $user = null, string $channel = 'private-user-')
     {
+        parent::__construct();
+        $this->user = Auth::user();
+
+        if ($user != null) {
+            $this->user = $user;
+        }
+
         $this->notification = [
             'message' => $message,
             'alert' => $alert
         ];
+        $to = $channel != 'private-user-' ? $channel : $channel . $this->user->id;
+        $this->channel = $to;
     }
 
     /**
@@ -44,7 +56,7 @@ class NotificationEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('notifications');
+        return new Channel($this->channel);
     }
 
     public function broadcastAs()

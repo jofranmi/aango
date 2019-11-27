@@ -7,7 +7,6 @@ use App\Events\Order\CreateOrderEvent;
 use App\Models\Order;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Class CreateOrderListener
@@ -16,11 +15,6 @@ use Illuminate\Support\Facades\Auth;
 class CreateOrderListener implements ShouldQueue
 {
     /**
-     * @var Auth $auth
-     */
-    protected $auth;
-
-    /**
      * @var Order $order
      */
     protected $order;
@@ -28,12 +22,10 @@ class CreateOrderListener implements ShouldQueue
     /**
      * Create the event listener.
      *
-     * @param Auth $auth
      * @param Order $order
      */
-    public function __construct(Auth $auth, Order $order)
+    public function __construct(Order $order)
     {
-        $this->auth = $auth;
         $this->order = $order;
     }
 
@@ -45,7 +37,7 @@ class CreateOrderListener implements ShouldQueue
      */
     public function handle(CreateOrderEvent $event)
     {
-        $order = $event->user->order()
+        $order = $event->user->orders()
             ->create([
                 'customer_id' => $event->customerId ?: $event->user->customer_id,
                 'status_id' => 1,
@@ -65,9 +57,15 @@ class CreateOrderListener implements ShouldQueue
             ]);
 
         if ($order) {
-            event(new NotificationEvent('Order has been created successfully!', 'alert-success'));
+            event(new NotificationEvent('Order has been created successfully!', 'alert-success', $event->user));
+            event(new NotificationEvent('New order from ' . $event->user->customer->name, 'alert-success', null, 'private-office'));
         } else {
-            event(new NotificationEvent('There was an error creating the order', 'alert-danger'));
+            event(new NotificationEvent('There was an error creating the order', 'alert-danger', $event->user));
         }
+    }
+
+    public function failed(CreateOrderEvent $event)
+    {
+        event(new NotificationEvent('There was an error creating the order', 'alert-danger', $event->user));
     }
 }

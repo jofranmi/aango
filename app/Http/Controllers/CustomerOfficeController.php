@@ -30,37 +30,7 @@ class CustomerOfficeController extends Controller
         $customers = $this->customer->all();
 
         return view('customer.index')
-            ->with('customers', $customers);
-    }
-
-    /**
-     * @return Renderable
-     */
-    public function createView()
-    {
-        return view('customer.create');
-    }
-
-    /**
-     * @param Request $request
-     */
-    public function create(Request $request)
-    {
-
-    }
-
-    public function view()
-    {
-
-    }
-
-    public function edit()
-    {
-
-    }
-
-    public function delete()
-    {
-
+            ->with('customers', $customers)
+            ->with('states', json_encode(config('aango.states')));
     }
 }

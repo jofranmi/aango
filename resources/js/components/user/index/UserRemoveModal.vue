@@ -13,7 +13,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button @click="remove" :disabled="query" type="button" class="btn btn-primary">Remove</button>
+                    <button @click="remove" type="button" class="btn btn-primary">Remove</button>
                 </div>
             </div>
         </div>
@@ -39,7 +39,6 @@
                 let eventHub = this.$eventHub;
                 let user = this.user;
                 let vm = this;
-                this.query = true;
 
                 axios.post('/request/removeUserFromCustomer', {
                     _token: this.csrf,
@@ -47,7 +46,11 @@
                 }).then(function () {
                     $('#removeModal').modal('hide')
                     vm.user = {};
-                    vm.query = true;
+                    let notification = {
+                        message: 'User has been removed from the customer',
+                        alert: 'alert-success'
+                    };
+                    eventHub.$emit('localNotification', notification)
                     eventHub.$emit('userRemoved', user);
                 });
             },

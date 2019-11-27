@@ -16,13 +16,37 @@
             console.log('Notification bar mounted.');
             Echo.channel('notifications')
                 .listen('.my-event', function(event) {
+                    console.log('event');
                     vm.notifications.push(event.notification);
                 });
+
+            Echo.private('user-' + this.user_id)
+                .listen('.my-event', function(event) {
+                    vm.notifications.push(event.notification);
+                });
+
+            Echo.private('admin')
+                .listen('.my-event', function(event) {
+                    vm.notifications.push(event.notification);
+                });
+
+            Echo.private('office')
+                .listen('.my-event', function(event) {
+                    vm.notifications.push(event.notification);
+                });
+        },
+        props: {
+            user_id: {type: Number},
         },
         data: function () {
             return {
                 notifications: [],
             };
+        },
+        created: function() {
+            this.$eventHub.$on('localNotification', (data) => {
+                this.notifications.push(data);
+            });
         },
     }
 </script>
@@ -33,7 +57,7 @@
         height: 100vh;
         overflow: hidden;
         position: fixed;
-        z-index: 10;
+        z-index: 1500;
         left: calc(100% - 250px);
     }
 </style>

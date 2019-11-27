@@ -34,7 +34,7 @@ class VINService
      * @param string $vin
      * @return array
      */
-    public function decodeVIN(string $vin)
+    public function decodeVIN(string $vin): array
     {
         $request = $this->transformVINResponse($this->guzzle->get(
             'https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/' . $vin,
@@ -52,7 +52,7 @@ class VINService
      * @param $response
      * @return array
      */
-    public function transformVINResponse($response)
+    public function transformVINResponse($response): array
     {
         $array = collect(json_decode($response->getBody()->getContents()));
         $errorCode = $array['Results'][0]->ErrorCode;

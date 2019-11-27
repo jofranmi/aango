@@ -1,7 +1,7 @@
 <template>
-    <div @click="viewEdit" class="card customer-card bg-secondary text-light">
+    <div @click="viewEdit" class="card user-card bg-secondary text-light">
         <div class="card-body">
-            <p class="card-text text-center">{{ customer.name }}</p>
+            <p class="card-text text-center">{{ user.name }}</p>
         </div>
     </div>
 </template>
@@ -11,20 +11,20 @@
 
     export default {
         mounted() {
-            console.log('Customer card mounted.')
+            console.log('User card mounted.')
         },
         props: {
-            customer: {type: Object}
+            user: {type: Object}
         },
         methods: {
             viewEdit() {
                 let eventHub = this.$eventHub;
 
-                axios.post('/request/getCustomerWithUsers', {
+                axios.post('/request/getUser', {
                     _token: this.csrf,
-                    id: this.customer.id,
+                    id: this.user.id,
                 }).then(function (data) {
-                    eventHub.$emit('viewEditCustomer', data.data);
+                    eventHub.$emit('viewEditUser', data.data);
                 });
             },
         },
@@ -32,7 +32,7 @@
 </script>
 
 <style>
-    .customer-card:hover {
+    .user-card:hover {
         background-color: #576068 !important;
         cursor: pointer;
     }
