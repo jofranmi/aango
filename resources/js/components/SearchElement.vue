@@ -1,3 +1,9 @@
+<!--
+<search-element :filters="{
+'Text': 'property',
+'Text': {'sub-item name': 'sub-item property'}
+}"></search-element>
+-->
 <template>
     <div class="input-group mb-3">
         <input v-model="query" type="text" class="form-control" placeholder="Search...">

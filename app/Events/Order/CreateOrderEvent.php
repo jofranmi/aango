@@ -3,6 +3,7 @@
 namespace App\Events\Order;
 
 use App\Events\AbstractEvent;
+use Illuminate\Http\Request;
 
 class CreateOrderEvent extends AbstractEvent
 {
@@ -26,21 +27,18 @@ class CreateOrderEvent extends AbstractEvent
      */
     public $vin;
 
-    /**
-     * Create a new event instance.
-     *
-     * @param $customerId
-     * @param $key
-     * @param $vehicle
-     * @param $vin
-     */
-    public function __construct($customerId, $key, $vehicle, $vin)
+	/**
+	 * Create a new event instance.
+	 *
+	 * @param Request $request
+	 */
+    public function __construct(Request $request)
     {
         parent::__construct();
 
-        $this->customerId = $customerId;
-        $this->key = $key;
-        $this->vehicle = $vehicle;
-        $this->vin = $vin;
+        $this->customerId = $request->customerId;
+        $this->key = $request->key;
+        $this->vehicle = $request->vehicle;
+        $this->vin = $request->vin;
     }
 }

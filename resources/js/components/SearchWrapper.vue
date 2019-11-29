@@ -12,10 +12,6 @@
 
 <script>
     export default {
-        mounted()
-        {
-            console.log('Search wrapper mounted.')
-        },
         props: {
             resources: {type: Array},
         },
@@ -23,6 +19,7 @@
             return {
                 filter: '',
                 query: '',
+                unfilteredResults: this.resources,
                 results: this.resources,
             }
         },
@@ -36,7 +33,7 @@
                 this.query = data;
 
                 if(this.query) {
-                    this.results = this.resources.filter((item) => {
+                    this.results = this.unfilteredResults.filter((item) => {
                         if (typeof this.filter === 'object') {
                             let key = Object.keys(this.filter);
                             let value = [this.filter[key[0]]];
@@ -55,11 +52,15 @@
                         }
                     });
                 } else {
-                    this.results = this.resources;
+                    this.results = this.unfilteredResults;
                 }
             });
             this.$eventHub.$on('filter', (data) => {
                 this.filter = data;
+            });
+            this.$eventHub.$on('updateSearchSourceData', (data) => {
+                this.unfilteredResults = data;
+                this.results = data;
             });
         },
     }

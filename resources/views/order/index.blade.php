@@ -9,11 +9,11 @@
 
                 <div class="card-body">
                     @can ('customer')
-                        <orders-filter :items="{{ $items->toJson() }}" :status="{{ $status->toJson() }}" :authorized="false"></orders-filter>
+                        <orders-filter :items="{{ $items->toJson() }}" :status="{{ $statuses->toJson() }}" :authorized="false"></orders-filter>
                         <orders-table :data="{{ $orders->toJson() }}" :authorized="false"></orders-table>
                     @else
-                        <orders-filter :customers="{{ $customers->toJson() }}" :items="{{ $items->toJson() }}" :status="{{ $status->toJson() }}" :authorized="true"></orders-filter>
-                        <orders-table :data="{{ $orders->toJson() }}" :authorized="true"></orders-table>
+                        <orders-filter :customers="{{ $customers->toJson() }}" :items="{{ $items->toJson() }}" :status="{{ $statuses->toJson() }}" :authorized="true"></orders-filter>
+                        <orders-table :data="{{ $orders->toJson() }}" :statuses="{{ $statuses->toJson() }}" :authorized="true"></orders-table>
                     @endcan
                     {{--<search-element :filters="{
                     'Name': {'user': 'name'},

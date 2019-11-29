@@ -20,6 +20,7 @@ class Customer extends Model
         'city',
         'state',
         'zip_code',
+        'phone',
     ];
 
     public function orders()

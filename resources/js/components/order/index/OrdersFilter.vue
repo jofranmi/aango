@@ -146,7 +146,7 @@
                         items: {
                             name: 'items.item',
                             fields: '',
-                            column: 'type',
+                            column: 'name',
                             operator: '=',
                             value: '',
                         },

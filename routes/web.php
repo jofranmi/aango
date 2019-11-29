@@ -17,12 +17,16 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@home')->name('home');
 
-Route::prefix('customers')->group(function () {
+Route::prefix('customers')->middleware('auth')->group(function () {
     Route::get('/', 'CustomerOfficeController@index');
 });
 
-Route::prefix('users')->group(function () {
+Route::prefix('users')->middleware('auth')->group(function () {
     Route::get('/', 'UserController@index');
+});
+
+Route::prefix('items')->middleware('auth')->group(function () {
+	Route::get('/', 'ItemController@index');
 });
 
 Route::prefix('orders')->middleware('auth')->group(function () {
@@ -42,6 +46,9 @@ Route::prefix('request')->middleware('auth')->group(function () {
     Route::post('getUser', 'RequestController@getUser');
     Route::post('createUser', 'RequestController@createUser');
     Route::post('editUser', 'RequestController@editUser');
+    Route::post('updateOrderStatus', 'RequestController@updateOrderStatus');
+    Route::post('createItemType', 'RequestController@createItemType');
+    Route::post('getKeysForMake', 'RequestController@getKeysForMake');
 });
 
 

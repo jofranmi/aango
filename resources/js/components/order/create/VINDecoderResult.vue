@@ -8,8 +8,8 @@
         </div>
         <div v-if="!error && vehicle && key" class="card text-white bg-secondary">
             <div class="card-body">
-                <h5 class="card-title">{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</h5>
-                <h6 class="card-subtitle mb-2">{{ key.item.type }}</h6>
+                <h5 class="card-title">{{ vehicle.year + ' ' + vehicle.make + ' ' + vehicle.model }}</h5>
+                <h6 class="card-subtitle mb-2">{{ key.item.name }}</h6>
                 <p class="card-text">{{ key.price | money }}</p>
                 <button :disabled="buttonDisable" v-on:click="createOrder" type="button" class="btn btn-primary">Create order</button>
             </div>

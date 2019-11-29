@@ -87,6 +87,11 @@ Vue.component(
 );
 
 Vue.component(
+    'orders-table-line',
+    require('./components/order/index/OrdersTableLine.vue').default
+);
+
+Vue.component(
     'search-vin',
     require('./components/order/create/SearchVIN.vue').default
 );
@@ -94,6 +99,24 @@ Vue.component(
 Vue.component(
     'vin-decoder-result',
     require('./components/order/create/VINDecoderResult.vue').default
+);
+
+/**
+ * Items
+ */
+Vue.component(
+    'item-card',
+    require('./components/item/index/ItemCard.vue').default
+);
+
+Vue.component(
+    'make-select',
+    require('./components/item/index/MakeSelect.vue').default
+);
+
+Vue.component(
+    'item-create-table',
+    require('./components/item/index/ItemCreateTable.vue').default
 );
 
 /**

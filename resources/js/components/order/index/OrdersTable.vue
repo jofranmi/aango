@@ -29,28 +29,18 @@
                 <th scope="col">Placed by</th>
                 <th scope="col">Placed on</th>
                 <th scope="col">Status</th>
-                <th scope="col">Actions</th>
+                <th v-if="authorized" scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
-            <tr v-for="order in Porders">
-                <th scope="col">{{ order.id }}</th>
-                <th scope="col">{{ order.vin }}</th>
-                <th scope="col">{{ order.year + ' ' + order.make + ' ' + order.model }}</th>
-                <th scope="col">{{ order.items[0].item.name }}</th>
-                <th scope="col">{{ order.total | money }}</th>
-                <th scope="col">{{ order.user.name }}</th>
-                <th scope="col">{{ order.created_at | date }}</th>
-                <th scope="col">{{ order.status.name }}</th>
-                <th scope="col"><button typeof="button" class="btn btn-sm btn-danger" href="">Cancel</button></th>
-            </tr>
+                <orders-table-line v-for="order in paginatedOrders" :order="order" :statuses="statuses" :authorized="authorized"></orders-table-line>
             </tbody>
         </table>
     </div>
 </template>
 
 <script>
-    import moment from "moment";
+    import axios from "axios"
 
     export default {
         mounted() {
@@ -58,10 +48,13 @@
         },
         props: {
             data: {type: Array},
+            statuses: {type: Array},
             authorized: {type: Boolean}
         },
         data: function () {
             return {
+                query: false,
+                csrf: $('meta[name="csrf-token"]').attr('content'),
                 orders: this.data,
                 pageNumber: 0,
                 size: 25,
@@ -74,6 +67,17 @@
             prevPage() {
                 this.pageNumber--;
             },
+            updateOrder(id) {
+                let vm = this;
+                this.queue = true;
+
+                axios.post('/request/updateOrder', {
+                    _token: this.csrf,
+                    id: id,
+                }).then(function(data) {
+                    vm.query = false;
+                });
+            }
         },
         computed: {
             pageCount() {
@@ -82,7 +86,7 @@
 
                 return Math.ceil(length/size);
             },
-                Porders() {
+                paginatedOrders() {
                 const start = this.pageNumber * this.size,
                     end = start + this.size;
                 return this.orders.slice(start, end);

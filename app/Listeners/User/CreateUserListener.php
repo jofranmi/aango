@@ -11,6 +11,10 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Class CreateUserListener
+ * @package App\Listeners\User
+ */
 class CreateUserListener implements ShouldQueue
 {
     /**
@@ -63,21 +67,25 @@ class CreateUserListener implements ShouldQueue
             'password' => Hash::make($event->password)
         ]);
 
-        if ($user) {
-            $this->userCreateMail
-                ->setPassword($event->password)
-                ->setUser($user);
-            $this->mailer
-                ->to($user->email)
-                ->send($this->userCreateMail);
-
-            event(new NotificationEvent('User has been created successfully!', 'alert-success', $event->user));
-        } else {
+        if (!$user) {
             event(new NotificationEvent('There was an error creating the user', 'alert-danger', $event->user));
+            return;
         }
+
+        $this->userCreateMail
+		->setPassword($event->password)
+		->setUser($user);
+		$this->mailer
+			->to($user->email)
+			->send($this->userCreateMail);
+
+		event(new NotificationEvent('User has been created successfully', 'alert-success', $event->user));
     }
 
-    public function failed(CreateUserEvent $event)
+	/**
+	 * @param CreateUserEvent $event
+	 */
+	public function failed(CreateUserEvent $event)
     {
         event(new NotificationEvent('There was an error creating the user', 'alert-danger', $event->user));
     }

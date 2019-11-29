@@ -67,7 +67,7 @@ class OrderController extends AbstractController
     {
         $customers = null;
         $items = $this->item->all();
-        $status = $this->status->all();
+        $statuses = $this->status->all();
 
         if (Gate::forUser(Auth::user())->allows('customer')) {
             $orders = Auth::user()->customer->orders
@@ -83,11 +83,11 @@ class OrderController extends AbstractController
                 ->get();
         }
 
-        return view('order.view')
+        return view('order.index')
             ->with('customers', $customers)
             ->with('items', $items)
             ->with('orders', $orders)
-            ->with('status', $status);
+            ->with('statuses', $statuses);
     }
 
 

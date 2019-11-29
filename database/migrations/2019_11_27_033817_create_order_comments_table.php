@@ -15,6 +15,9 @@ class CreateOrderCommentsTable extends Migration
     {
         Schema::create('order_comments', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('user_id')->default(0);
+            $table->string('comment');
             $table->timestamps();
         });
     }

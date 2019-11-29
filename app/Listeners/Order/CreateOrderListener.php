@@ -56,15 +56,19 @@ class CreateOrderListener implements ShouldQueue
                 'price_original' => $event->key['price'],
             ]);
 
-        if ($order) {
-            event(new NotificationEvent('Order has been created successfully!', 'alert-success', $event->user));
-            event(new NotificationEvent('New order from ' . $event->user->customer->name, 'alert-success', null, 'private-office'));
-        } else {
+        if (!$order) {
+
             event(new NotificationEvent('There was an error creating the order', 'alert-danger', $event->user));
         }
+
+        event(new NotificationEvent('Order has been created successfully', 'alert-success', $event->user));
+		event(new NotificationEvent('New order from ' . $event->user->customer->name, 'alert-success', null, 'private-office'));
     }
 
-    public function failed(CreateOrderEvent $event)
+	/**
+	 * @param CreateOrderEvent $event
+	 */
+	public function failed(CreateOrderEvent $event)
     {
         event(new NotificationEvent('There was an error creating the order', 'alert-danger', $event->user));
     }

@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Events\Customer\CreateCustomerEvent;
+use App\Events\Item\CreateItemEvent;
 use App\Events\Notification\NotificationEvent;
 use App\Events\Order\CreateOrderEvent;
 use App\Events\User\CreateUserEvent;
 use App\Listeners\Customer\CreateCustomerListener;
+use App\Listeners\Item\CreateItemListener;
 use App\Listeners\Notification\NotificationListener;
 use App\Listeners\Order\CreateOrderListener;
 use App\Listeners\User\CreateUserListener;
@@ -28,6 +30,7 @@ class EventServiceProvider extends ServiceProvider
         CreateOrderEvent::class => [CreateOrderListener::class],
         CreateCustomerEvent::class => [CreateCustomerListener::class],
         CreateUserEvent::class => [CreateUserListener::class],
+		CreateItemEvent::class => [CreateItemListener::class],
     ];
 
     /**

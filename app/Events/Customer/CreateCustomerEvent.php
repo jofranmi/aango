@@ -22,7 +22,7 @@ class CreateCustomerEvent extends AbstractEvent
     public $address;
 
     /**
-     * @var string city
+     * @var string $city
      */
     public $city;
 
@@ -35,6 +35,11 @@ class CreateCustomerEvent extends AbstractEvent
      * @var int $zip_code
      */
     public $zip_code;
+
+    /**
+     * @var int $phone
+     */
+    public $phone;
 
     /**
      * Create a new event instance.
@@ -50,5 +55,6 @@ class CreateCustomerEvent extends AbstractEvent
         $this->city = $request->city;
         $this->state = $request->state;
         $this->zip_code = $request->zip_code;
+        $this->phone = $request->phone;
     }
 }

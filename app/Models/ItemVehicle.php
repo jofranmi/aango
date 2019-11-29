@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemVehicle extends Model
 {
-    public function itemsOrders()
+	protected $fillable = [
+		'year_from',
+		'year_to',
+		'make',
+		'model',
+		'price',
+	];
+
+	public function itemsOrders()
     {
         return $this->hasMany(ItemOrder::class);
     }

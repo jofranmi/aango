@@ -7,7 +7,6 @@ use App\Events\Notification\NotificationEvent;
 use App\Models\Customer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class CreateCustomerListener
@@ -38,8 +37,6 @@ class CreateCustomerListener implements ShouldQueue
      */
     public function handle(CreateCustomerEvent $event)
     {
-        Log::info(json_encode($event));
-        Log::info('testzz');
         $customer = $this->customer
             ->create([
                 'name' => $event->name,
@@ -47,16 +44,21 @@ class CreateCustomerListener implements ShouldQueue
                 'city' => $event->city,
                 'state' => $event->state,
                 'zip_code' => $event->zip_code,
+                'phone' => empty($event->phone) ? 0000000 : $event->phone,
             ]);
 
-        if ($customer) {
-            event(new NotificationEvent('Customer has been created successfully!', 'alert-success', $event->user));
-        } else {
+        if (!$customer) {
+
             event(new NotificationEvent('There was an error creating the customer', 'alert-danger', $event->user));
         }
+
+        event(new NotificationEvent('Customer has been created successfully', 'alert-success', $event->user));
     }
 
-    public function failed(CreateCustomerEvent $event)
+	/**
+	 * @param CreateCustomerEvent $event
+	 */
+	public function failed(CreateCustomerEvent $event)
     {
         event(new NotificationEvent('There was an error creating the customer', 'alert-danger', $event->user));
     }
