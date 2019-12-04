@@ -12,7 +12,6 @@
 </template>
 
 <script>
-    import moment from "moment";
     import axios from "axios"
 
     export default {
@@ -51,7 +50,7 @@
                     password: this.password,
                     type: this.type,
                     customer: this.customer,
-                }).then(function (data) {
+                }).then(function () {
                     vm.query = false;
                     vm.name = '';
                     vm.email = '';

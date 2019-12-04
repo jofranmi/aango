@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class ItemOrder
+ * @package App\Models
+ */
 class ItemOrder extends Model
 {
     /**
-     * @var array
+     * @var array $fillable
      */
     protected $fillable = [
         'order_id',
@@ -15,6 +19,16 @@ class ItemOrder extends Model
         'price',
         'price_original',
     ];
+
+	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		'created_at',
+		'updated_at',
+	];
 
     public function order()
     {

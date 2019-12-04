@@ -29,11 +29,11 @@
                 <th scope="col">Placed by</th>
                 <th scope="col">Placed on</th>
                 <th scope="col">Status</th>
-                <th v-if="authorized" scope="col">Actions</th>
+                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody>
-                <orders-table-line v-for="order in paginatedOrders" :order="order" :statuses="statuses" :authorized="authorized"></orders-table-line>
+                <orders-table-line v-for="(order, key) in paginatedOrders" :order="order" :statuses="statuses" :authorized="authorized" :key="key"></orders-table-line>
             </tbody>
         </table>
     </div>
@@ -43,9 +43,6 @@
     import axios from "axios"
 
     export default {
-        mounted() {
-            console.log('Orders table mounted.')
-        },
         props: {
             data: {type: Array},
             statuses: {type: Array},
@@ -74,7 +71,7 @@
                 axios.post('/request/updateOrder', {
                     _token: this.csrf,
                     id: id,
-                }).then(function(data) {
+                }).then(function() {
                     vm.query = false;
                 });
             }

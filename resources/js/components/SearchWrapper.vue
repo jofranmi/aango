@@ -55,9 +55,11 @@
                     this.results = this.unfilteredResults;
                 }
             });
+
             this.$eventHub.$on('filter', (data) => {
                 this.filter = data;
             });
+
             this.$eventHub.$on('updateSearchSourceData', (data) => {
                 this.unfilteredResults = data;
                 this.results = data;

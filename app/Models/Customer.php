@@ -23,6 +23,16 @@ class Customer extends Model
         'phone',
     ];
 
+	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		'created_at',
+		'updated_at',
+	];
+
     public function orders()
     {
         return $this->hasMany(Order::class);

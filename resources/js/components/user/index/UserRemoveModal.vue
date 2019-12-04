@@ -24,9 +24,6 @@
     import axios from "axios";
 
     export default {
-        mounted() {
-            console.log('Customer card mounted.')
-        },
         data: function () {
             return {
                 query: false,

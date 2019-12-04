@@ -10,9 +10,6 @@
     import axios from "axios";
 
     export default {
-        mounted() {
-            console.log('Customer card mounted.')
-        },
         props: {
             customer: {type: Object}
         },

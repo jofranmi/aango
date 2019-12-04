@@ -92,8 +92,18 @@ Vue.component(
 );
 
 Vue.component(
+    'order-view-modal',
+    require('./components/order/index/OrderViewModal.vue').default
+);
+
+Vue.component(
     'search-vin',
     require('./components/order/create/SearchVIN.vue').default
+);
+
+Vue.component(
+    'vin-decoder-result',
+    require('./components/order/create/VINDecoderResult.vue').default
 );
 
 Vue.component(
@@ -117,6 +127,11 @@ Vue.component(
 Vue.component(
     'item-create-table',
     require('./components/item/index/ItemCreateTable.vue').default
+);
+
+Vue.component(
+    'item-view-edit-table',
+    require('./components/item/index/ItemViewEditTable.vue').default
 );
 
 /**
@@ -151,6 +166,14 @@ Vue.filter('money', function (value) {
 
 Vue.filter('date', function (date) {
     return moment(date).format('MM-DD-YYYY');
+})
+
+Vue.filter('datetime', function (date) {
+    return moment(date).format('MM-DD-YYYY hh:mm A');
+})
+
+Vue.filter('datetimeVerbose', function (date) {
+    return moment(date).format('MMMM DD YYYY hh:mm A');
 })
 
 Vue.filter('capitalize', function (value) {

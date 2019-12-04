@@ -1,5 +1,5 @@
 <template>
-    <div class="input-group mb-3 col-sm-1 col-sm-4 col-lg-3">
+    <div class="input-group mb-3" :class="cols">
         <div class="input-group-prepend">
             <span class="input-group-text">{{ text }}</span>
         </div>
@@ -13,8 +13,18 @@
     export default {
         props: {
             text: {type: String},
-            value: {type: String},
+            value: {type: [String, Number]},
             data: {type: Array},
+            large: {type: Boolean},
+        },
+        computed: {
+            cols: function () {
+                if (this.large == true) {
+                    return 'col-md-12 col-lg-6';
+                }
+
+                return 'col-sm-4 col-lg-3';
+            },
         },
     }
 </script>

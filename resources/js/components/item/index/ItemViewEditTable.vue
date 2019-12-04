@@ -38,7 +38,7 @@
                 <filter-select v-model="type" :data="itemtypes" :text="'Key type'" :large="true"></filter-select>
                 <filter-string v-model="price" :text="'Price'" :large="true"></filter-string>
                 <div class="mb-3 col-sm-1 col-sm-4 col-lg-3">
-                    <button v-on:click="createItemVehicle" :disabled="buttonDisable" class="btn btn-primary">Create <i class="fas fa-plus"></i></button>
+                    <button v-on:click="editItemVehicle" :disabled="buttonDisable" class="btn btn-primary">Update <i class="fas fa-pen"></i></button>
                 </div>
             </div>
         </div>
@@ -46,8 +46,8 @@
 </template>
 
 <script>
-    import moment from "moment";
     import axios from "axios";
+    import moment from "moment";
     import Datepicker from "vuejs-datepicker";
 
     export default {
@@ -60,7 +60,7 @@
         },
         computed: {
             buttonDisable: function () {
-                return this.yearFrom == '' || this.yearTo == '' || this.make == '' || this.model == '' || this.type == '' || this.price == '' || this.query;
+                return this.id == '' || this.yearFrom == '' || this.yearTo == '' || this.make == '' || this.model == '' || this.type == '' || this.price == '' || this.query;
             },
             disabledDates: function () {
                 return {to: new Date((parseInt(this.yearFrom) + 1), 0, 1)};
@@ -70,6 +70,7 @@
             return {
                 query: false,
                 csrf: $('meta[name="csrf-token"]').attr('content'),
+                id: '',
                 yearFrom: '',
                 yearTo: '',
                 make: '',
@@ -88,12 +89,13 @@
             customFormatter(date) {
                 return moment(date).format('YYYY');
             },
-            createItemVehicle() {
+            editItemVehicle() {
                 let vm = this;
                 this.query = true;
 
-                axios.post('/request/createItemType', {
+                axios.post('/request/editItemVehicle', {
                     _token: this.csrf,
+                    id: this.id,
                     yearFrom: this.yearFrom,
                     yearTo: this.yearTo,
                     make: this.make,
@@ -102,14 +104,6 @@
                     price: this.price,
                 }).then(function () {
                     vm.query = false;
-                    vm.yearFrom = '';
-                    vm.yearTo = '';
-                    vm.make = '';
-                    vm.model = '';
-                    vm.type = '';
-                    vm.price = '';
-                    vm.$refs.date1.clearDate();
-                    vm.$refs.date2.clearDate();
                 });
             },
             getModelsFromMake (make) {
@@ -140,6 +134,22 @@
                     vm.vin = '';
                 });
             },
+        },
+        created: function() {
+            this.$eventHub.$on('viewEditItemVehicle', (data) => {
+                this.getModelsFromMake(data.make);
+                this.id = data.id;
+                this.yearFrom = data.year_from,
+                this.yearTo = data.year_to,
+                this.make = data.make,
+                this.model = data.model,
+                this.type = data.item_id,
+                this.price = data.price
+                this.$refs.date1.setDate(moment(data.year_from + '-1-1').toDate());
+                this.$refs.date2.setDate(moment(data.year_to + '-1-1').toDate());
+
+                $('#navigation a:last-child').tab('show')
+            });
         },
     }
 </script>

@@ -11,11 +11,9 @@
 </template>
 
 <script>
+	import axios from "axios";
+
     export default {
-        mounted() {
-            console.log('Search VIN mounted.');
-            this.vin = '1N4AL3AP0DN566294';
-        },
         data: function () {
             return {
                 buttonDisable: true,
@@ -38,11 +36,11 @@
                 let vm = this;
                 this.buttonDisable = true;
 
-                $.post('/request/getItemsFromVIN', {
+                axios.post('/request/getItemsFromVIN', {
                     _token: this.csrf,
                     vin: this.vin,
-                }).done(function (data) {
-                    eventHub.$emit('decodedVINWithKey', data);
+                }).then(function (data) {
+                    eventHub.$emit('decodedVINWithKey', data.data);
                     vm.buttonDisable = false;
                 });
             },

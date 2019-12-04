@@ -6,6 +6,8 @@
             <filter-string v-model="password" :text="'Password'"></filter-string>
             <div class="mb-3 col-sm-1 col-sm-4 col-lg-3">
                 <button v-on:click="editUser" :disabled="buttonDisable" class="btn btn-primary">Edit <i class="fas fa-pen"></i></button>
+                <button v-if="deleted != null" v-on:click="deleteUser" :disabled="query || id == ''" class="btn btn-primary">Restore <i class="fas fa-trash-restore"></i></button>
+                <button v-else v-on:click="deleteUser" :disabled="query || id == ''" class="btn btn-danger">Delete <i class="fas fa-trash"></i></button>
             </div>
         </div>
     </div>
@@ -15,9 +17,6 @@
     import axios from "axios"
 
     export default {
-        mounted() {
-            console.log('User view table mounted.')
-        },
         computed: {
             buttonDisable: function () {
                 return this.name == '' || this.email == '' || this.query;
@@ -31,11 +30,11 @@
                 name: '',
                 email: '',
                 password: '',
+                deleted: null,
             };
         },
         methods: {
             editUser() {
-                let eventHub = this.$eventHub;
                 let vm = this;
                 this.query = true;
 
@@ -45,10 +44,21 @@
                     name: this.name,
                     email: this.email,
                     password: this.password,
-                }).then(function(data) {
+                }).then(function () {
                     vm.query = false;
                 });
             },
+			deleteUser() {
+				let vm = this;
+				this.query = true;
+
+				axios.post('/request/deleteUser', {
+					_token: this.csrf,
+					id: this.id,
+				}).then(function () {
+					vm.query = false;
+				});
+			},
             setCustomerToRemove(user) {
                 this.$eventHub.$emit('setUserToRemoveFromCustomer', user);
             },
@@ -59,6 +69,7 @@
                 this.id = data.id;
                 this.name = data.name;
                 this.email = data.email;
+                this.deleted = data.deleted_at;
 
                 $('#navigation a:last-child').tab('show')
             });

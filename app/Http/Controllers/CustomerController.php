@@ -30,14 +30,7 @@ class CustomerController extends Controller
         $customers = $this->customer->all();
 
         return view('customer.index')
-            ->with('customers', $customers);
-    }
-
-    /**
-     * @return Renderable
-     */
-    public function createView()
-    {
-        return view('customer.create');
+            ->with('customers', $customers)
+            ->with('states', json_encode(config('aango.states')));
     }
 }

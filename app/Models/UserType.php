@@ -5,6 +5,10 @@ namespace App\Models;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class UserType
+ * @package App\Models
+ */
 class UserType extends Model
 {
     public $timestamps = false;

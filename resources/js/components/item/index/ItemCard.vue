@@ -2,7 +2,7 @@
     <div @click="viewEdit" class="card item-card bg-secondary text-light">
         <div class="card-body text-center">
             <p class="card-text">{{ item.year_from + '-' + item.year_to + ' ' + item.make + ' ' + item.model }}</p>
-            <p class="card-subtitle">{{ item.item.name }}</p>
+            <p class="card-subtitle">{{ item.item.name }} - {{ item.price | money }}</p>
         </div>
     </div>
 </template>

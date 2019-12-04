@@ -49,9 +49,6 @@
     import axios from "axios"
 
     export default {
-        mounted() {
-            console.log('Customer create table mounted.')
-        },
         props: {
             states: {type: Object}
         },
@@ -74,7 +71,6 @@
         },
         methods: {
             create() {
-                let eventHub = this.$eventHub;
                 let vm = this;
                 this.query = true;
 
@@ -86,7 +82,7 @@
                     state: this.state,
                     zip_code: this.zip_code,
                     phone: this.phone,
-                }).then(function (data) {
+                }).then(function () {
                     vm.query = false;
                     vm.name = '';
                     vm.address = '';

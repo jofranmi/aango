@@ -12,12 +12,13 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;//, SoftDeletes;
+    use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array $fillable
      */
     protected $fillable = [
         'user_types_id',

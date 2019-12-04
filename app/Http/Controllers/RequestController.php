@@ -7,9 +7,9 @@ use App\Events\Item\CreateItemEvent;
 use App\Events\Notification\NotificationEvent;
 use App\Events\Order\CreateOrderEvent;
 use App\Events\User\CreateUserEvent;
-use App\Mail\user\UserCreateMail;
 use App\Mail\User\UserPasswordChangeMail;
 use App\Models\Customer;
+use App\Models\Item;
 use App\Models\ItemVehicle;
 use App\Models\Order;
 use App\Models\Status;
@@ -19,6 +19,7 @@ use App\Services\Items\ItemService;
 use App\Services\VIN\VINService;
 use App\User;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Mail\Mailer;
@@ -30,6 +31,11 @@ class RequestController extends Controller
      * @var Customer $customer
      */
     protected $customer;
+
+	/**
+	 * @var Item $item
+	 */
+    protected $item;
 
     /**
      * @var ItemService $itemService
@@ -66,6 +72,11 @@ class RequestController extends Controller
      */
     protected $userPasswordChangeMail;
 
+	/**
+	 * @var Vehicle $vehicle
+	 */
+    protected $vehicle;
+
     /**
      * @var VINService $vinService
      */
@@ -74,6 +85,7 @@ class RequestController extends Controller
 	/**
 	 * RequestController constructor.
 	 * @param Customer $customer
+	 * @param Item $item
 	 * @param ItemService $itemService
 	 * @param ItemVehicle $itemVehicle
 	 * @param Mailer $mailer
@@ -81,11 +93,13 @@ class RequestController extends Controller
 	 * @param Status $status
 	 * @param User $user
 	 * @param UserPasswordChangeMail $userPasswordChangeMail
+	 * @param Vehicle $vehicle
 	 * @param VINService $vinService
 	 */
-    public function __construct(Customer $customer, ItemService $itemService, ItemVehicle $itemVehicle, Mailer $mailer, Order $order, Status $status, User $user, UserPasswordChangeMail $userPasswordChangeMail, VINService $vinService)
+    public function __construct(Customer $customer, Item $item, ItemService $itemService, ItemVehicle $itemVehicle, Mailer $mailer, Order $order, Status $status, User $user, UserPasswordChangeMail $userPasswordChangeMail, Vehicle $vehicle, VINService $vinService)
     {
         $this->customer = $customer;
+        $this->item = $item;
         $this->itemService = $itemService;
         $this->itemVehicle = $itemVehicle;
         $this->mailer = $mailer;
@@ -93,6 +107,7 @@ class RequestController extends Controller
         $this->status = $status;
         $this->user = $user;
         $this->userPasswordChangeMail = $userPasswordChangeMail;
+        $this->vehicle = $vehicle;
         $this->vinService = $vinService;
     }
 
@@ -127,6 +142,17 @@ class RequestController extends Controller
             'vin' => $request->vin
         ]);
     }
+
+	/**
+	 * @param Request $request
+	 * @return ResponseFactory|Response
+	 */
+	public function getVehicleFromVIN(Request $request)
+	{
+		$vehicle = $this->vinService->decodeVIN($request->vin);
+
+		return response($vehicle);
+	}
 
     /**
      * @param Request $request
@@ -179,8 +205,9 @@ class RequestController extends Controller
 
         if (!$update) {
         	event(new NotificationEvent('There was an error updating the customer information', 'alert-danger'));
-
+        	return;
         }
+
 		event(new NotificationEvent('Customer information has been updated', 'alert-success'));
     }
 
@@ -215,6 +242,7 @@ class RequestController extends Controller
 
         if (!$update) {
 			event(new NotificationEvent('There was an error removing the user from the customer', 'alert-danger'));
+			return;
 		}
 
         event(new NotificationEvent('User has been removed from the customer', 'alert-success'));
@@ -234,6 +262,7 @@ class RequestController extends Controller
 
         if (!$update) {
         	event(new NotificationEvent('There was an error adding the user to the customer', 'alert-danger'));
+        	return;
         }
 
         event(new NotificationEvent('User has been added to customer', 'alert-success'));
@@ -246,6 +275,7 @@ class RequestController extends Controller
     public function getUser(Request $request)
     {
         $user = $this->user
+            ->withTrashed()
             ->with('customer')
             ->find($request->id);
 
@@ -258,7 +288,9 @@ class RequestController extends Controller
     public function editUser(Request $request)
     {
         $password = $request->password;
-        $user = $this->user->find($request->id);
+        $user = $this->user
+            ->withTrashed()
+            ->find($request->id);
 
         $user->name = $request->name;
         $user->email = $request->email;
@@ -271,9 +303,8 @@ class RequestController extends Controller
 
         if (!$update) {
             event(new NotificationEvent('There was an error updating the user information', 'alert-danger'));
+            return;
         }
-
-		event(new NotificationEvent('User information has been updated', 'alert-success'));
 
 		if ($password != '') {
 			$this->userPasswordChangeMail->setPassword($password);
@@ -281,6 +312,38 @@ class RequestController extends Controller
 				->to($user->email)
 				->send($this->userPasswordChangeMail);
 		}
+
+		event(new NotificationEvent('User information has been updated', 'alert-success'));
+    }
+
+    /**
+     * @param Request $request
+     * @throws \Exception
+     */
+    public function deleteUser(Request $request)
+    {
+        $user = $this->user
+            ->withTrashed()
+            ->find($request->id);
+
+        if ($user->deleted_at != null) {
+            $user->deleted_at = null;
+            $user->save();
+
+            event(new NotificationEvent('Account for ' . $user->name . ' has been restored', 'alert-success'));
+
+            return;
+        }
+
+        $delete = $user->delete();
+
+        if (!$delete) {
+            event(new NotificationEvent('There was an error deleting the account', 'alert-success'));
+
+            return;
+        }
+
+        event(new NotificationEvent('Account for ' . $user->name . ' has been deleted', 'alert-success'));
     }
 
 	/**
@@ -290,16 +353,25 @@ class RequestController extends Controller
 	{
 		$order = $this->order->find($request->id);
 		$status = $this->status->find($request->status);
-		$user = $order->user;
+		$users = $order->customer->users;
 
 		$update = $order->update(['status_id' => $status->id]);
 
 		if (!$update) {
 			event(new NotificationEvent('There was an error updating the order status', 'alert-danger'));
+			return;
 		}
 
+		$order->comments()->create([
+		    'user_id' => auth()->user()->id,
+            'comment' => 'Order status has been changed to ' . $status->name,
+        ]);
+
 		event(new NotificationEvent('Order status has been updated', 'alert-success'));
-		event(new NotificationEvent('Status for ' . $order->vin . ' has been changed to ' . $status->name, 'alert-info', $user));
+
+		foreach ($users as $user) {
+			event(new NotificationEvent('Status for ' . $order->vin . ' has been changed to ' . $status->name, 'alert-info', $user));
+		}
 	}
 
 	/**
@@ -318,4 +390,110 @@ class RequestController extends Controller
 
 		return response($keys);
 	}
+
+	/**
+	 * @param Request $request
+	 * @return ResponseFactory|Response
+	 */
+	public function getItemVehicle(Request $request)
+	{
+		$key = $this->itemVehicle
+			->with('item')
+			->find($request->id);
+
+		return response($key);
+	}
+
+	/**
+	 * @param Request $request
+	 */
+	public function editItemVehicle(Request $request)
+	{
+		$key = $this->itemVehicle->find($request->id);
+		$item = $this->item->find($request->type);
+
+		$key->item_id = $item->id;
+		$key->year_from = $request->yearFrom;
+		$key->year_to = $request->yearTo;
+		$key->make = $request->make;
+		$key->model = $request->model;
+		$key->price = $request->price;
+
+		$update = $key->save();
+
+		if (!$update) {
+			event(new NotificationEvent('There was an error updating the key', 'alert-danger'));
+
+			return;
+		}
+
+		event(new NotificationEvent('Key has been updated', 'alert-success'));
+	}
+
+	/**
+	 * @param Request $request
+	 * @return ResponseFactory|Response
+	 */
+	public function getModelsFromMake(Request $request)
+	{
+		$models = $this->vehicle
+			->where('make', $request->make)
+			->select('model')
+			->distinct()
+			->orderBy('model', 'asc')
+			->get();
+
+		return response($models);
+	}
+
+    /**
+     * @param Request $request
+     * @return ResponseFactory|Response
+     */
+    public function getOrderDetailsFromVIN(Request $request)
+    {
+        $order = $this->order
+            ->with(['comments' => function ($query) {
+                $query->orderBy('created_at', 'desc')->with('user');
+            }])
+            ->with('items.item')
+            ->with('status')
+            ->with('user')
+            ->find($request->id)
+            ->setHidden(['updated_at']);
+
+        return response($order);
+    }
+
+    /**
+     * @param Request $request
+     * @return ResponseFactory|Response|void
+     */
+    public function createOrderComment(Request $request)
+    {
+        $order = $this->order->find($request->id);
+
+        $comment = $order->comments()->create([
+            'user_id' => auth()->user()->id,
+            'comment' => $request->comment,
+        ]);
+
+        if (!$comment) {
+            event(new NotificationEvent('There was an error adding the comment', 'alert-danger'));
+
+            return;
+        }
+
+        $comment->load('user');
+
+        $users = $order->customer->users;
+
+        event(new NotificationEvent('Comment has been added to order', 'alert-success'));
+
+        foreach ($users as $user) {
+            event(new NotificationEvent('New comment for ' . $order->vin . ': ' . $comment->comment, 'alert-info', $user));
+        }
+
+        return response($comment);
+    }
 }

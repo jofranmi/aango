@@ -52,15 +52,14 @@ class UserController extends Controller
     {
         $users = null;
         $userTypes = null;
-        $customers = null;
+        $customers = $this->customer->all();
 
         if (Gate::forUser(Auth::user())->allows('admin')) {
             $users = $this->user
-                //->withTrashed()
+                ->withTrashed()
                 ->with('customer')
                 ->get();
             $userTypes = $this->userType->all();
-            $customers = $this->customer->all();
         } else if (Gate::forUser(Auth::user())->allows('office')) {
             $users = $this->user
                 ->customers()
@@ -68,8 +67,7 @@ class UserController extends Controller
                 ->get();
             $userTypes = $this->userType
                 ->customer()
-                ->all();
-            $customers = $this->customer->all();
+                ->get();
         }
 
         return view('user.index')

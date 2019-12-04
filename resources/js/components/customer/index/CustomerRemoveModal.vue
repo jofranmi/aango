@@ -1,7 +1,7 @@
 <template>
     <div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content text-dark">
+            <div class="modal-content bg-dark text-light">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Remove</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -24,9 +24,6 @@
     import axios from "axios";
 
     export default {
-        mounted() {
-            console.log('Customer card mounted.')
-        },
         data: function () {
             return {
                 query: false,
@@ -61,3 +58,13 @@
         },
     }
 </script>
+
+<style>
+    .modal-header {
+        border-bottom: 1px solid #1b2026;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #1b2026;
+    }
+</style>

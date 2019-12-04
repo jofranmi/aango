@@ -62,6 +62,9 @@
                             </li>
                             @can ('office')
                             <li class="nav-item">
+                                <a class="nav-link" href="{{ url('/items') }}">{{ __('Items') }}</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ url('/customers') }}">{{ __('Customers') }}</a>
                             </li>
                             <li class="nav-item">

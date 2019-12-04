@@ -52,11 +52,9 @@
 <script>
     import Datepicker from 'vuejs-datepicker';
     import moment from "moment";
+	import axios from "axios";
 
     export default {
-        mounted() {
-            console.log('Orders filters mounted.')
-        },
         props: {
             authorized: {type: Boolean},
             customers: {type: Array},
@@ -78,11 +76,11 @@
                 let vm = this;
                 this.buttonDisable = true;
 
-                $.post('/orders/filterOrders', {
+                axios.post('/orders/filterOrders', {
                     _token: this.csrf,
                     filters: this.request.filters,
                     joins: this.request.joins,
-                }).done(function (data) {
+                }).then(function (data) {
                     eventHub.$emit('filterResult', data);
                     vm.buttonDisable = false;
                 });

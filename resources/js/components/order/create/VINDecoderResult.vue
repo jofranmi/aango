@@ -18,10 +18,9 @@
 </template>
 
 <script>
+	import axios from "axios";
+
     export default {
-        mounted() {
-            console.log('VIN Decode mounted.')
-        },
         data: function () {
             return {
                 buttonDisable: false,
@@ -49,12 +48,12 @@
                 vm.buttonDisable = true;
                 eventHub.$emit('createOrder')
 
-                $.post('/request/createOrder', {
+                axios.post('/request/createOrder', {
                     _token: this.csrf,
                     key: this.key,
                     vehicle: this.vehicle,
                     vin: this.vin,
-                }).done(function () {
+                }).then(function () {
                     eventHub.$emit('orderCreated');
                     vm.buttonDisable = false;
                     vm.key = null;

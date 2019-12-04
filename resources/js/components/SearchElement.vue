@@ -19,7 +19,6 @@
 <script>
     export default {
         mounted() {
-            console.log('Search element mounted.');
             this.$eventHub.$emit('filter', this.filter);
         },
         data: function() {

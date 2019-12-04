@@ -6,6 +6,8 @@ use App\Events\Item\CreateItemEvent;
 use App\Events\Notification\NotificationEvent;
 use App\Models\Item;
 use App\Models\ItemVehicle;
+use App\Models\Vehicle;
+use App\Services\VIN\VINService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -26,15 +28,29 @@ class CreateItemListener implements ShouldQueue
 	protected $itemVehicle;
 
 	/**
+	 * @var Vehicle $vehicle
+	 */
+	protected $vehicle;
+
+	/**
+	 * @var VINService $vinService
+	 */
+	protected $vinService;
+
+	/**
 	 * Create the event listener.
 	 *
 	 * @param Item $item
 	 * @param ItemVehicle $itemVehicle
+	 * @param Vehicle $vehicle
+	 * @param VINService $vinService
 	 */
-    public function __construct(Item $item, ItemVehicle $itemVehicle)
+    public function __construct(Item $item, ItemVehicle $itemVehicle, Vehicle $vehicle, VINService $vinService)
     {
     	$this->item = $item;
     	$this->itemVehicle = $itemVehicle;
+    	$this->vehicle = $vehicle;
+    	$this->vinService = $vinService;
     }
 
 	/**
@@ -51,8 +67,7 @@ class CreateItemListener implements ShouldQueue
     		return;
 		}
 
-		$key = $item->keys()
-			->create([
+		$key = $item->keys()->create([
 				'year_from' => $event->yearFrom,
 				'year_to' => $event->yearTo,
 				'make' => strtoupper($event->make),
@@ -64,7 +79,7 @@ class CreateItemListener implements ShouldQueue
 			event(new NotificationEvent('There was an error creating the key', 'alert-danger', $event->user));
 		}
 
-		event(new NotificationEvent('Item has been created successfully', 'alert-success', $event->user));
+		event(new NotificationEvent('Key has been created successfully', 'alert-success', $event->user));
     }
 
 	public function failed(CreateItemEvent $event)

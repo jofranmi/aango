@@ -18,6 +18,7 @@ class CreateVehiclesTable extends Migration
             $table->integer('year');
             $table->string('make');
             $table->string('model');
+            $table->string('vin_sequence');
             $table->timestamps();
         });
     }

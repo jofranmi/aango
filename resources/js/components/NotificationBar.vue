@@ -13,7 +13,6 @@
     export default {
         mounted() {
             let vm = this;
-            console.log('Notification bar mounted.');
             Echo.channel('notifications')
                 .listen('.my-event', function(event) {
                     console.log('event');

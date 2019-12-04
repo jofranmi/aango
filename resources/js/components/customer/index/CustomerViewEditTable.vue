@@ -73,9 +73,6 @@
     import axios from "axios"
 
     export default {
-        mounted() {
-            console.log('Customer create table mounted.')
-        },
         props: {
             states: {type: Object}
         },
@@ -113,7 +110,7 @@
                     state: this.state,
                     zip_code: this.zip_code,
                     phone: this.phone,
-                }).then(function(data) {
+                }).then(function () {
                     vm.query = false;
                 });
             },
@@ -126,7 +123,7 @@
                     _token: this.csrf,
                     customer_id: this.customer.id,
                     user_id: this.user_id,
-                }).then(function(user) {
+                }).then(function (user) {
                     vm.query = false;
                     vm.users = usersArray.filter(function(oldUser) {
                         return oldUser.id != user.data.id && oldUser.name != user.data.name;

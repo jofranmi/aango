@@ -27,6 +27,11 @@
                     </search-wrapper>--}}
                 </div>
             </div>
+            @can ('customer')
+                <order-view-modal :authorized="false"></order-view-modal>
+            @else
+                <order-view-modal :authorized="true"></order-view-modal>
+            @endcan
         </div>
     </div>
 </div>

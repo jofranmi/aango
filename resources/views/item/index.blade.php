@@ -36,11 +36,11 @@
                     </div>
 
                     <div class="tab-pane fade" id="create" role="tabpanel" aria-labelledby="create-tab">
-                        <item-create-table :itemtypes="{{ $itemTypes->toJson() }}"></item-create-table>
+                        <item-create-table :itemtypes="{{ $itemTypes->toJson() }}" :makeslist="{{ $makesVehicles->toJson() }}"></item-create-table>
                     </div>
 
                     <div class="tab-pane fade" id="viewEdit" role="tabpanel" aria-labelledby="view-tab">
-{{--                        <customer-view-edit-table :states="{{ $states }}"></customer-view-edit-table>--}}
+                        <item-view-edit-table :itemtypes="{{ $itemTypes->toJson() }}" :makeslist="{{ $makesVehicles->toJson() }}"></item-view-edit-table>
                     </div>
                 </div>
             </div>

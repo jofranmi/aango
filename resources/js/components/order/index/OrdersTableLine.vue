@@ -12,10 +12,11 @@
                 <option v-for="status in statuses" :value="status.id">{{ status.name }}</option>
             </select>
         </th>
-        <th v-if="authorized" scope="col">
-            <button :disabled="query" @click="updateOrder" type="button" class="btn btn-sm btn-primary text-light">Update</button>
-        </th>
         <th v-else scope="col">{{ order.status.name }}</th>
+        <th  scope="col">
+            <button v-if="authorized" :disabled="query" @click="updateOrder" type="button" class="btn btn-sm btn-primary text-light">Update</button>
+            <button :disabled="query" @click="getOrderDetailsFromVIN" type="button" class="btn btn-sm btn-secondary text-light">View</button>
+        </th>
     </tr>
 </template>
 
@@ -36,18 +37,31 @@
             };
         },
         methods: {
-            updateOrder(id) {
+            updateOrder() {
                 let vm = this;
-                this.queue = true;
+                this.query = true;
 
                 axios.post('/request/updateOrderStatus', {
                     _token: this.csrf,
                     id: vm.order.id,
                     status: vm.status
-                }).then(function(data) {
+                }).then(function() {
                     vm.query = false;
                 });
-            }
+            },
+			getOrderDetailsFromVIN() {
+				let eventHub = this.$eventHub;
+				let vm = this;
+				this.query = true;
+
+				axios.post('/request/getOrderDetailsFromVIN', {
+					_token: this.csrf,
+					id: this.order.id
+				}).then(function (data) {
+					vm.query = false;
+					eventHub.$emit('setOrderToView', data.data);
+				});
+			}
         },
     }
 </script>

@@ -5,6 +5,10 @@ namespace App\Models;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Order
+ * @package App\Models
+ */
 class Order extends Model
 {
     /**
@@ -21,6 +25,21 @@ class Order extends Model
         'total',
         'total_original',
     ];
+
+	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		'created_at',
+		'updated_at',
+	];
+
+	public function comments()
+	{
+		return $this->hasMany(OrderComment::class);
+	}
 
     public function customer()
     {
