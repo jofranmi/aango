@@ -69,7 +69,8 @@ class CreateUserListener implements ShouldQueue
 
         if (!$user) {
             event(new NotificationEvent('There was an error creating the user', 'alert-danger', $event->user));
-            return;
+
+            return true;
         }
 
         $this->userCreateMail

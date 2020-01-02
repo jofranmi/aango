@@ -6,18 +6,21 @@ use App\Events\Customer\CreateCustomerEvent;
 use App\Events\Item\CreateItemEvent;
 use App\Events\Notification\NotificationEvent;
 use App\Events\Order\CreateOrderEvent;
+use App\Events\ServiceLocation\CreateServiceLocationEvent;
 use App\Events\User\CreateUserEvent;
 use App\Mail\User\UserPasswordChangeMail;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\ItemVehicle;
 use App\Models\Order;
+use App\Models\ServiceLocation;
 use App\Models\Status;
 use App\Models\UserType;
 use App\Models\Vehicle;
 use App\Services\Items\ItemService;
 use App\Services\VIN\VINService;
 use App\User;
+use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -57,6 +60,11 @@ class RequestController extends Controller
      */
     protected $order;
 
+    /**
+     * @var ServiceLocation $serviceLocation
+     */
+    protected $serviceLocation;
+
 	/**
 	 * @var Status $status
 	 */
@@ -82,21 +90,22 @@ class RequestController extends Controller
      */
     protected $vinService;
 
-	/**
-	 * RequestController constructor.
-	 * @param Customer $customer
-	 * @param Item $item
-	 * @param ItemService $itemService
-	 * @param ItemVehicle $itemVehicle
-	 * @param Mailer $mailer
-	 * @param Order $order
-	 * @param Status $status
-	 * @param User $user
-	 * @param UserPasswordChangeMail $userPasswordChangeMail
-	 * @param Vehicle $vehicle
-	 * @param VINService $vinService
-	 */
-    public function __construct(Customer $customer, Item $item, ItemService $itemService, ItemVehicle $itemVehicle, Mailer $mailer, Order $order, Status $status, User $user, UserPasswordChangeMail $userPasswordChangeMail, Vehicle $vehicle, VINService $vinService)
+    /**
+     * RequestController constructor.
+     * @param Customer $customer
+     * @param Item $item
+     * @param ItemService $itemService
+     * @param ItemVehicle $itemVehicle
+     * @param Mailer $mailer
+     * @param Order $order
+     * @param ServiceLocation $serviceLocation
+     * @param Status $status
+     * @param User $user
+     * @param UserPasswordChangeMail $userPasswordChangeMail
+     * @param Vehicle $vehicle
+     * @param VINService $vinService
+     */
+    public function __construct(Customer $customer, Item $item, ItemService $itemService, ItemVehicle $itemVehicle, Mailer $mailer, Order $order, ServiceLocation $serviceLocation, Status $status, User $user, UserPasswordChangeMail $userPasswordChangeMail, Vehicle $vehicle, VINService $vinService)
     {
         $this->customer = $customer;
         $this->item = $item;
@@ -104,6 +113,7 @@ class RequestController extends Controller
         $this->itemVehicle = $itemVehicle;
         $this->mailer = $mailer;
         $this->order = $order;
+        $this->serviceLocation = $serviceLocation;
         $this->status = $status;
         $this->user = $user;
         $this->userPasswordChangeMail = $userPasswordChangeMail;
@@ -112,6 +122,7 @@ class RequestController extends Controller
     }
 
     /**
+     * Decodes a vin and returns the related item
      * @param Request $request
      * @return ResponseFactory|Response
      */
@@ -119,6 +130,8 @@ class RequestController extends Controller
     {
         $order = $this->order->where('vin', $request->vin)->first();
         $item = null;
+        $states = null;
+        $serviceLocations = null;
 
         if ($order) {
             $decode['errorCode'] = 5000;
@@ -128,6 +141,8 @@ class RequestController extends Controller
 
             if ($decode['vehicle'] instanceof Vehicle) {
                 $item = $this->itemService->getItemForVehicle($decode['vehicle']);
+                $serviceLocations = $this->serviceLocation->orderBy('name')->get();
+                $states = config('aango.states');
             }
 
             if ($decode['errorCode'] == 0 && $item == null) {
@@ -139,11 +154,14 @@ class RequestController extends Controller
         return response([
             'request' => $decode,
             'key' => $item,
-            'vin' => $request->vin
+            'vin' => $request->vin,
+            'service_locations' => $serviceLocations,
+            'states' => $states
         ]);
     }
 
 	/**
+     * Decodes a vin and returns the vin
 	 * @param Request $request
 	 * @return ResponseFactory|Response
 	 */
@@ -190,6 +208,15 @@ class RequestController extends Controller
 		event(new CreateItemEvent($request));
 	}
 
+    /**
+     * @param Request $request
+     */
+    public function createServiceLocation(Request $request)
+    {
+        event(new NotificationEvent('Service location create request has been sent and will be processed shortly', 'alert-info'));
+        event(new CreateServiceLocationEvent($request));
+    }
+
     public function editCustomer(Request $request)
     {
         $customer = $this->customer->find($request->id);
@@ -205,7 +232,8 @@ class RequestController extends Controller
 
         if (!$update) {
         	event(new NotificationEvent('There was an error updating the customer information', 'alert-danger'));
-        	return;
+
+        	return true;
         }
 
 		event(new NotificationEvent('Customer information has been updated', 'alert-success'));
@@ -231,9 +259,10 @@ class RequestController extends Controller
         ]);
     }
 
-	/**
-	 * @param Request $request
-	 */
+    /**
+     * @param Request $request
+     * @return bool
+     */
     public function removeUserFromCustomer(Request $request)
     {
         $update = $this->user
@@ -242,7 +271,8 @@ class RequestController extends Controller
 
         if (!$update) {
 			event(new NotificationEvent('There was an error removing the user from the customer', 'alert-danger'));
-			return;
+
+			return true;
 		}
 
         event(new NotificationEvent('User has been removed from the customer', 'alert-success'));
@@ -250,22 +280,24 @@ class RequestController extends Controller
 
     /**
      * @param Request $request
+     * @return bool|ResponseFactory|Response
      */
     public function addUserToCustomer(Request $request)
     {
-        $user = $this->user
-            ->find($request->user_id);
-        $customer = $this->customer
-            ->find($request->customer_id);
+        $user = $this->user->find($request->user_id);
+        $customer = $this->customer->find($request->customer_id);
 
         $update = $user->update(['customer_id' => $customer->id]);
 
         if (!$update) {
         	event(new NotificationEvent('There was an error adding the user to the customer', 'alert-danger'));
-        	return;
+
+        	return true;
         }
 
         event(new NotificationEvent('User has been added to customer', 'alert-success'));
+
+        return response($user);
     }
 
     /**
@@ -284,6 +316,7 @@ class RequestController extends Controller
 
     /**
      * @param Request $request
+     * @return bool
      */
     public function editUser(Request $request)
     {
@@ -303,7 +336,8 @@ class RequestController extends Controller
 
         if (!$update) {
             event(new NotificationEvent('There was an error updating the user information', 'alert-danger'));
-            return;
+
+            return true;
         }
 
 		if ($password != '') {
@@ -318,7 +352,8 @@ class RequestController extends Controller
 
     /**
      * @param Request $request
-     * @throws \Exception
+     * @return bool
+     * @throws Exception
      */
     public function deleteUser(Request $request)
     {
@@ -332,7 +367,7 @@ class RequestController extends Controller
 
             event(new NotificationEvent('Account for ' . $user->name . ' has been restored', 'alert-success'));
 
-            return;
+            return true;
         }
 
         $delete = $user->delete();
@@ -340,15 +375,16 @@ class RequestController extends Controller
         if (!$delete) {
             event(new NotificationEvent('There was an error deleting the account', 'alert-success'));
 
-            return;
+            return true;
         }
 
         event(new NotificationEvent('Account for ' . $user->name . ' has been deleted', 'alert-success'));
     }
 
-	/**
-	 * @param Request $request
-	 */
+    /**
+     * @param Request $request
+     * @return bool
+     */
     public function updateOrderStatus(Request $request)
 	{
 		$order = $this->order->find($request->id);
@@ -359,7 +395,8 @@ class RequestController extends Controller
 
 		if (!$update) {
 			event(new NotificationEvent('There was an error updating the order status', 'alert-danger'));
-			return;
+
+			return true;
 		}
 
 		$order->comments()->create([
@@ -404,9 +441,10 @@ class RequestController extends Controller
 		return response($key);
 	}
 
-	/**
-	 * @param Request $request
-	 */
+    /**
+     * @param Request $request
+     * @return bool
+     */
 	public function editItemVehicle(Request $request)
 	{
 		$key = $this->itemVehicle->find($request->id);
@@ -424,7 +462,7 @@ class RequestController extends Controller
 		if (!$update) {
 			event(new NotificationEvent('There was an error updating the key', 'alert-danger'));
 
-			return;
+			return true;
 		}
 
 		event(new NotificationEvent('Key has been updated', 'alert-success'));
@@ -481,7 +519,7 @@ class RequestController extends Controller
         if (!$comment) {
             event(new NotificationEvent('There was an error adding the comment', 'alert-danger'));
 
-            return;
+            return true;
         }
 
         $comment->load('user');
@@ -495,5 +533,43 @@ class RequestController extends Controller
         }
 
         return response($comment);
+    }
+
+    /**
+     * @param Request $request
+     * @return ResponseFactory|Response
+     */
+    public function getServiceLocation(Request $request)
+    {
+        $location = $this->serviceLocation->find($request->id);
+
+        return response($location);
+    }
+
+    /**
+     * @param Request $request
+     * @return bool
+     */
+    public function editServiceLocation(Request $request)
+    {
+        $location = $this->serviceLocation->find($request->id);
+
+        $location->name = $request->name;
+        $location->address = $request->address;
+        $location->address2 = $request->address2;
+        $location->city = $request->city;
+        $location->state = $request->state;
+        $location->zip_code = $request->zip_code;
+        $location->phone = $request->phone;
+
+        $update = $location->save();
+
+        if (!$update) {
+            event(new NotificationEvent('There was an error updating the service location', 'alert-danger'));
+
+            return true;
+        }
+
+        event(new NotificationEvent('Service location has been updated', 'alert-success'));
     }
 }

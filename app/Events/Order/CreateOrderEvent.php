@@ -18,6 +18,11 @@ class CreateOrderEvent extends AbstractEvent
     public $key;
 
     /**
+     * @var $serviceLocation
+     */
+    public $serviceLocation;
+
+    /**
      * @var $vehicle
      */
     public $vehicle;
@@ -38,6 +43,7 @@ class CreateOrderEvent extends AbstractEvent
 
         $this->customerId = $request->customerId;
         $this->key = $request->key;
+        $this->serviceLocation = $request->service_location;
         $this->vehicle = $request->vehicle;
         $this->vin = $request->vin;
     }

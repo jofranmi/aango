@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Status extends Model
 {
+    const PENDING = 1;
+    const PROCESSING = 2;
+    const ASSIGNED = 3;
+    const SHIPPED = 4;
+    const COMPLETED = 5;
+    const CANCELLED = 6;
+
     public function orders()
     {
         return $this->hasMany(Status::class);

@@ -51,6 +51,11 @@ class Order extends Model
         return $this->hasMany(ItemOrder::class);
     }
 
+    public function serviceLocation()
+    {
+        return $this->belongsTo(ServiceLocation::class);
+    }
+
     public function status()
     {
         return $this->belongsTo(Status::class);

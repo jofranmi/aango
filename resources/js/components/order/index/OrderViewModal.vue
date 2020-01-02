@@ -17,7 +17,7 @@
                     <b>Placed on:</b> {{ order.created_at | datetimeVerbose }} <br>
                     <b>Placed by:</b> {{ 'user' in order ? order.user.name : '' }} <br>
                 </div>
-                <div v-if="authorized" class="container-fluid">
+                <div class="container-fluid">
                     <div class="form-group">
                         <textarea v-model="comment" class="form-control" rows="3"></textarea>
                     </div>
@@ -42,9 +42,6 @@
     import axios from "axios";
 
     export default {
-		props: {
-			authorized: {type: Boolean}
-		},
         data: function () {
             return {
                 query: false,

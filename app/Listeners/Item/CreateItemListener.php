@@ -77,6 +77,8 @@ class CreateItemListener implements ShouldQueue
 
     	if(!$key) {
 			event(new NotificationEvent('There was an error creating the key', 'alert-danger', $event->user));
+
+			return true;
 		}
 
 		event(new NotificationEvent('Key has been created successfully', 'alert-success', $event->user));

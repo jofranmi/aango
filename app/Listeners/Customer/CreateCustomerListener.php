@@ -33,7 +33,7 @@ class CreateCustomerListener implements ShouldQueue
      * Handle the event.
      *
      * @param CreateCustomerEvent $event
-     * @return void
+     * @return bool
      */
     public function handle(CreateCustomerEvent $event)
     {
@@ -44,12 +44,13 @@ class CreateCustomerListener implements ShouldQueue
                 'city' => $event->city,
                 'state' => $event->state,
                 'zip_code' => $event->zip_code,
-                'phone' => empty($event->phone) ? 0000000 : $event->phone,
+                'phone' => $event->phone,
             ]);
 
         if (!$customer) {
-
             event(new NotificationEvent('There was an error creating the customer', 'alert-danger', $event->user));
+
+            return true;
         }
 
         event(new NotificationEvent('Customer has been created successfully', 'alert-success', $event->user));

@@ -6,6 +6,10 @@ use App\Models\Vehicle;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Support\Collection;
 
+/**
+ * Class VINService
+ * @package App\Services\VIN
+ */
 class VINService
 {
     /**

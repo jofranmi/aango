@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,8 @@ class CreateOrdersTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('customer_id');
-            $table->unsignedBigInteger('status_id')->default(1);
+            $table->unsignedBigInteger('service_location_id');
+            $table->unsignedBigInteger('status_id')->default(Status::PENDING);
             $table->string('vin');
             $table->integer('year');
             $table->string('make');

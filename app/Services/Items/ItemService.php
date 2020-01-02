@@ -4,8 +4,11 @@ namespace App\Services\Items;
 
 use App\Models\ItemVehicle;
 use App\Models\Vehicle;
-use Illuminate\Support\Facades\DB;
 
+/**
+ * Class ItemService
+ * @package App\Services\Items
+ */
 class ItemService
 {
     /**

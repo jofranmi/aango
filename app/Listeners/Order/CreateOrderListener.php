@@ -5,6 +5,8 @@ namespace App\Listeners\Order;
 use App\Events\Notification\NotificationEvent;
 use App\Events\Order\CreateOrderEvent;
 use App\Models\Order;
+use App\Models\Status;
+use App\Services\ServiceLocation\ServiceLocationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -20,27 +22,43 @@ class CreateOrderListener implements ShouldQueue
     protected $order;
 
     /**
+     * @var ServiceLocationService $serviceLocationService
+     */
+    protected $serviceLocationService;
+
+    /**
      * Create the event listener.
      *
      * @param Order $order
+     * @param ServiceLocationService $serviceLocationService
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, ServiceLocationService $serviceLocationService)
     {
         $this->order = $order;
+        $this->serviceLocationService = $serviceLocationService;
     }
 
     /**
      * Handle the event.
      *
-     * @param  CreateOrderEvent  $event
-     * @return void
+     * @param CreateOrderEvent $event
+     * @return bool
      */
     public function handle(CreateOrderEvent $event)
     {
+        $serviceLocation = $this->serviceLocationService->getOrCreateServiceLocation($event->serviceLocation);
+
+        if (!$serviceLocation) {
+            event(new NotificationEvent('There was an error creating the order', 'alert-danger', $event->user));
+
+            return true;
+        }
+
         $order = $event->user->orders()
             ->create([
                 'customer_id' => $event->customerId ?: $event->user->customer_id,
-                'status_id' => 1,
+                'service_location_id' => $serviceLocation->id,
+                'status_id' => Status::PENDING,
                 'vin' => $event->vin,
                 'year' => $event->vehicle['year'],
                 'make' => $event->vehicle['make'],
@@ -57,8 +75,9 @@ class CreateOrderListener implements ShouldQueue
             ]);
 
         if (!$order) {
-
             event(new NotificationEvent('There was an error creating the order', 'alert-danger', $event->user));
+
+            return true;
         }
 
         event(new NotificationEvent('Order has been created successfully', 'alert-success', $event->user));

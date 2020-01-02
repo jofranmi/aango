@@ -33,6 +33,10 @@ Route::prefix('items')->middleware('auth', 'office')->group(function () {
 	Route::get('/', 'ItemController@index');
 });
 
+Route::prefix('service-locations')->middleware('auth', 'office')->group(function () {
+    Route::get('/', 'ServiceLocationController@index');
+});
+
 Route::prefix('orders')->middleware('auth')->group(function () {
     Route::get('/', 'OrderController@index');
     Route::get('create', 'OrderController@createView');
@@ -43,6 +47,7 @@ Route::prefix('request')->middleware('auth')->group(function () {
     Route::post('getItemsFromVIN', 'RequestController@getItemsFromVIN');
     Route::post('createOrder', 'RequestController@createOrder');
     Route::post('getOrderDetailsFromVIN', 'RequestController@getOrderDetailsFromVIN');
+    Route::post('createOrderComment', 'RequestController@createOrderComment');
     Route::middleware(['office'])->group(function () {
         Route::post('createCustomer', 'RequestController@createCustomer');
         Route::post('editCustomer', 'RequestController@editCustomer');
@@ -59,8 +64,10 @@ Route::prefix('request')->middleware('auth')->group(function () {
         Route::post('editItemVehicle', 'RequestController@editItemVehicle');
         Route::post('getModelsFromMake', 'RequestController@getModelsFromMake');
         Route::post('getVehicleFromVIN', 'RequestController@getVehicleFromVIN');
-        Route::post('createOrderComment', 'RequestController@createOrderComment');
         Route::post('deleteUser', 'RequestController@deleteUser');
+        Route::post('createServiceLocation', 'RequestController@createServiceLocation');
+        Route::post('getServiceLocation', 'RequestController@getServiceLocation');
+        Route::post('editServiceLocation', 'RequestController@editServiceLocation');
     });
 });
 

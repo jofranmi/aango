@@ -51,6 +51,29 @@ Vue.component(
 );
 
 /**
+ * Service Location
+ */
+Vue.component(
+    'service-location-card',
+    require('./components/service-location/index/ServiceLocationCard.vue').default
+);
+
+Vue.component(
+    'service-location-create-table',
+    require('./components/service-location/index/ServiceLocationCreateTable.vue').default
+);
+
+Vue.component(
+    'service-location-view-edit-table',
+    require('./components/service-location/index/ServiceLocationViewEditTable.vue').default
+);
+
+Vue.component(
+    'service-location-remove-modal',
+    require('./components/service-location/index/ServiceLocationRemoveModal.vue').default
+);
+
+/**
  * User
  */
 Vue.component(
